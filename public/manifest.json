@@ -1,0 +1,30 @@
+{
+  "short_name": "가계부",
+  "name": "스마트 가계부",
+  "description": "수입과 지출을 한눈에 관리하는 스마트 가계부",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#0A0A0A",
+  "background_color": "#0A0A0A",
+  "lang": "ko",
+  "categories": ["finance", "productivity"]
+}

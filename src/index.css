@@ -1,0 +1,122 @@
+:root {
+  --bg-primary: #0A0A0A;
+  --bg-surface: #141414;
+  --bg-card: #1E1E1E;
+  --bg-elevated: #252525;
+  --accent: #8B5CF6;
+  --accent-light: #A78BFA;
+  --income: #10B981;
+  --income-bg: rgba(16,185,129,0.12);
+  --expense: #F87171;
+  --expense-bg: rgba(248,113,113,0.12);
+  --warning: #FBBF24;
+  --danger: #EF4444;
+  --text-primary: #F9FAFB;
+  --text-secondary: #9CA3AF;
+  --text-muted: #6B7280;
+  --border: #2D2D2D;
+  --border-light: #3D3D3D;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  --tab-height: 64px;
+  --header-height: 56px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+
+#root {
+  height: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  position: relative;
+  background: var(--bg-primary);
+  overflow: hidden;
+}
+
+input, textarea, select, button {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+}
+
+::-webkit-scrollbar { width: 0; height: 0; }
+
+.screen {
+  position: absolute;
+  inset: 0;
+  top: var(--header-height);
+  bottom: calc(var(--tab-height) + env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  border: 1px solid var(--border);
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+  border-radius: var(--radius-md);
+  padding: 14px 20px;
+  font-weight: 600;
+  font-size: 15px;
+  width: 100%;
+  transition: opacity 0.15s;
+}
+.btn-primary:active { opacity: 0.8; }
+
+.btn-secondary {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  padding: 14px 20px;
+  font-weight: 500;
+  font-size: 15px;
+  width: 100%;
+  border: 1px solid var(--border-light);
+  transition: opacity 0.15s;
+}
+.btn-secondary:active { opacity: 0.8; }
+
+.amount-income { color: var(--income); }
+.amount-expense { color: var(--expense); }
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.tag-income { background: var(--income-bg); color: var(--income); }
+.tag-expense { background: var(--expense-bg); color: var(--expense); }

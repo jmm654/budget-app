@@ -12,8 +12,11 @@ const PRESET_ICONS = ['🍕','🍺','🎮','🐶','🐱','✈️','🚗','⛽','
 
 /* ─── 카테고리 추가 폼 ─── */
 const catFormS = {
-  overlay: { position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', zIndex:300, display:'flex', alignItems:'flex-end', justifyContent:'center', overflow:'hidden' },
-  sheet: { width:'100%', maxWidth:430, background:'#141414', borderRadius:'20px 20px 0 0', padding:'0 16px calc(24px + env(safe-area-inset-bottom,0px))', maxHeight:'90vh', overflowY:'scroll', WebkitOverflowScrolling:'touch', overscrollBehavior:'contain', touchAction:'pan-y' },
+  overlay: { position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', zIndex:300, display:'flex', alignItems:'flex-end', justifyContent:'center' },
+  sheet: { width:'100%', maxWidth:430, background:'#141414', borderRadius:'20px 20px 0 0', maxHeight:'90vh', display:'flex', flexDirection:'column' },
+  sheetHeader: { padding:'0 16px', flexShrink:0 },
+  scrollContent: { flex:1, overflowY:'scroll', WebkitOverflowScrolling:'touch', overscrollBehavior:'contain', padding:'0 16px 8px' },
+  sheetFooter: { flexShrink:0, padding:'12px 16px calc(24px + env(safe-area-inset-bottom,0px))' },
   handle: { width:40, height:4, borderRadius:2, background:'#3D3D3D', margin:'12px auto 16px' },
   title: { fontSize:17, fontWeight:700, color:'#F9FAFB', textAlign:'center', marginBottom:20 },
   label: { fontSize:13, fontWeight:600, color:'#9CA3AF', marginBottom:8 },
@@ -55,58 +58,59 @@ function CategoryForm({ onSave, onClose }) {
   return (
     <div style={catFormS.overlay} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div style={catFormS.sheet}>
-        <div style={catFormS.handle} />
-        <div style={catFormS.title}>카테고리 추가</div>
+        <div style={catFormS.sheetHeader}>
+          <div style={catFormS.handle} />
+          <div style={catFormS.title}>카테고리 추가</div>
+        </div>
 
-        {/* 미리보기 */}
-        <div style={catFormS.previewRow}>
-          <div style={catFormS.previewIcon(color)}>{finalIcon}</div>
-          <div>
-            <div style={{ fontSize:15, fontWeight:700, color:'#F9FAFB' }}>{name || '카테고리 이름'}</div>
-            <div style={{ fontSize:12, color: type === 'income' ? '#10B981' : '#F87171', marginTop:2 }}>{type === 'income' ? '수입' : '지출'}</div>
+        <div style={catFormS.scrollContent}>
+          <div style={catFormS.previewRow}>
+            <div style={catFormS.previewIcon(color)}>{finalIcon}</div>
+            <div>
+              <div style={{ fontSize:15, fontWeight:700, color:'#F9FAFB' }}>{name || '카테고리 이름'}</div>
+              <div style={{ fontSize:12, color: type === 'income' ? '#10B981' : '#F87171', marginTop:2 }}>{type === 'income' ? '수입' : '지출'}</div>
+            </div>
+          </div>
+
+          <div style={catFormS.label}>종류</div>
+          <div style={catFormS.typeRow}>
+            <button style={catFormS.typeBtn(type === 'income', '#10B981')} onClick={() => setType('income')}>💚 수입</button>
+            <button style={catFormS.typeBtn(type === 'expense', '#F87171')} onClick={() => setType('expense')}>❤️ 지출</button>
+          </div>
+
+          <div style={catFormS.label}>카테고리 이름</div>
+          <input style={catFormS.input} type="text" placeholder="예: 반려동물" value={name} onChange={(e) => setName(e.target.value)} maxLength={8} autoFocus />
+
+          <div style={catFormS.label}>아이콘 선택</div>
+          <div style={catFormS.iconGrid}>
+            {PRESET_ICONS.map((ic) => (
+              <button key={ic} style={catFormS.iconBtn(!customIcon && icon === ic)} onClick={() => { setIcon(ic); setCustomIcon(''); }}>
+                {ic}
+              </button>
+            ))}
+          </div>
+          <input
+            style={{ ...catFormS.input, marginTop: -8 }}
+            type="text"
+            placeholder="직접 입력 (이모지 붙여넣기)"
+            value={customIcon}
+            onChange={(e) => setCustomIcon(e.target.value)}
+            maxLength={2}
+          />
+
+          <div style={catFormS.label}>색상</div>
+          <div style={catFormS.colorGrid}>
+            {PRESET_COLORS.map((c) => (
+              <button key={c} style={catFormS.colorBtn(c, color === c)} onClick={() => setColor(c)} />
+            ))}
           </div>
         </div>
 
-        {/* 수입/지출 */}
-        <div style={catFormS.label}>종류</div>
-        <div style={catFormS.typeRow}>
-          <button style={catFormS.typeBtn(type === 'income', '#10B981')} onClick={() => setType('income')}>💚 수입</button>
-          <button style={catFormS.typeBtn(type === 'expense', '#F87171')} onClick={() => setType('expense')}>❤️ 지출</button>
-        </div>
-
-        {/* 이름 */}
-        <div style={catFormS.label}>카테고리 이름</div>
-        <input style={catFormS.input} type="text" placeholder="예: 반려동물" value={name} onChange={(e) => setName(e.target.value)} maxLength={8} autoFocus />
-
-        {/* 아이콘 선택 */}
-        <div style={catFormS.label}>아이콘 선택</div>
-        <div style={catFormS.iconGrid}>
-          {PRESET_ICONS.map((ic) => (
-            <button key={ic} style={catFormS.iconBtn(!customIcon && icon === ic)} onClick={() => { setIcon(ic); setCustomIcon(''); }}>
-              {ic}
-            </button>
-          ))}
-        </div>
-        <input
-          style={{ ...catFormS.input, marginTop: -8 }}
-          type="text"
-          placeholder="직접 입력 (이모지 붙여넣기)"
-          value={customIcon}
-          onChange={(e) => setCustomIcon(e.target.value)}
-          maxLength={2}
-        />
-
-        {/* 색상 선택 */}
-        <div style={catFormS.label}>색상</div>
-        <div style={catFormS.colorGrid}>
-          {PRESET_COLORS.map((c) => (
-            <button key={c} style={catFormS.colorBtn(c, color === c)} onClick={() => setColor(c)} />
-          ))}
-        </div>
-
-        <div style={catFormS.btnRow}>
-          <button style={catFormS.cancelBtn} onClick={onClose}>취소</button>
-          <button style={catFormS.saveBtn(canSave)} onClick={handleSave} disabled={!canSave}>추가하기</button>
+        <div style={catFormS.sheetFooter}>
+          <div style={catFormS.btnRow}>
+            <button style={catFormS.cancelBtn} onClick={onClose}>취소</button>
+            <button style={catFormS.saveBtn(canSave)} onClick={handleSave} disabled={!canSave}>추가하기</button>
+          </div>
         </div>
       </div>
     </div>
@@ -146,8 +150,11 @@ const s = {
   toggleBtn: (active) => ({ flex:1, padding:'8px', borderRadius:8, background: active ? 'rgba(16,185,129,0.15)' : 'rgba(107,114,128,0.15)', color: active ? '#10B981' : '#6B7280', fontSize:12, fontWeight:600, border:`1px solid ${active ? '#10B981' : '#3D3D3D'}`, cursor:'pointer' }),
   deleteBtn: { padding:'8px 12px', borderRadius:8, background:'rgba(239,68,68,0.1)', color:'#EF4444', fontSize:12, fontWeight:600, border:'1px solid rgba(239,68,68,0.3)', cursor:'pointer' },
   emptyWrap: { textAlign:'center', color:'#6B7280', padding:'24px 0', fontSize:13 },
-  overlay: { position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', zIndex:200, display:'flex', alignItems:'flex-end', justifyContent:'center', overflow:'hidden' },
-  sheet: { width:'100%', maxWidth:430, background:'#141414', borderRadius:'20px 20px 0 0', padding:'0 16px calc(20px + env(safe-area-inset-bottom,0px))', maxHeight:'88vh', overflowY:'scroll', WebkitOverflowScrolling:'touch', overscrollBehavior:'contain', touchAction:'pan-y' },
+  overlay: { position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', zIndex:200, display:'flex', alignItems:'flex-end', justifyContent:'center' },
+  sheet: { width:'100%', maxWidth:430, background:'#141414', borderRadius:'20px 20px 0 0', maxHeight:'88vh', display:'flex', flexDirection:'column' },
+  sheetHeader: { padding:'0 16px', flexShrink:0 },
+  scrollContent: { flex:1, overflowY:'scroll', WebkitOverflowScrolling:'touch', overscrollBehavior:'contain', padding:'0 16px 8px' },
+  sheetFooter: { flexShrink:0, padding:'12px 16px calc(20px + env(safe-area-inset-bottom,0px))' },
   handle: { width:40, height:4, borderRadius:2, background:'#3D3D3D', margin:'12px auto 16px' },
   sheetTitle: { fontSize:17, fontWeight:700, color:'#F9FAFB', marginBottom:20, textAlign:'center' },
   label: { fontSize:13, fontWeight:600, color:'#9CA3AF', marginBottom:8 },
@@ -155,7 +162,7 @@ const s = {
   select: { width:'100%', background:'#1E1E1E', border:'1px solid #2D2D2D', borderRadius:10, padding:'12px 14px', color:'#F9FAFB', fontSize:15, marginBottom:14, appearance:'none' },
   typeRow: { display:'flex', gap:8, marginBottom:14 },
   typeBtn: (active, color) => ({ flex:1, padding:'10px', borderRadius:10, border:`2px solid ${active ? color : '#2D2D2D'}`, background: active ? color+'22' : 'transparent', color: active ? color : '#9CA3AF', fontSize:14, fontWeight:700, cursor:'pointer' }),
-  btnRow: { display:'flex', gap:10, marginTop:4 },
+  btnRow: { display:'flex', gap:10 },
   cancelBtn: { flex:1, padding:'13px', borderRadius:12, background:'#1E1E1E', border:'1px solid #3D3D3D', color:'#9CA3AF', fontSize:14, fontWeight:600, cursor:'pointer' },
   saveBtn: { flex:2, padding:'13px', borderRadius:12, background:'linear-gradient(135deg,#7C3AED,#8B5CF6)', color:'white', fontSize:14, fontWeight:700, cursor:'pointer', border:'none' },
 };
@@ -190,55 +197,61 @@ function AddRecurringForm({ categories, onSave, onClose }) {
   return (
     <div style={s.overlay} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div style={s.sheet}>
-        <div style={s.handle} />
-        <div style={s.sheetTitle}>반복 내역 추가</div>
-
-        <div style={s.label}>수입/지출</div>
-        <div style={s.typeRow}>
-          <button style={s.typeBtn(type === 'income', '#10B981')} onClick={() => { setType('income'); setCategory(cats[0]?.id || 'salary'); }}>💚 수입</button>
-          <button style={s.typeBtn(type === 'expense', '#F87171')} onClick={() => { setType('expense'); setCategory(cats[0]?.id || 'food'); }}>❤️ 지출</button>
+        <div style={s.sheetHeader}>
+          <div style={s.handle} />
+          <div style={s.sheetTitle}>반복 내역 추가</div>
         </div>
 
-        <div style={s.label}>금액 (원)</div>
-        <input style={s.input} type="tel" inputMode="numeric" placeholder="0"
-          value={amount ? parseInt(amount).toLocaleString() : ''}
-          onChange={(e) => setAmount(e.target.value.replace(/[^0-9]/g, ''))} />
+        <div style={s.scrollContent}>
+          <div style={s.label}>수입/지출</div>
+          <div style={s.typeRow}>
+            <button style={s.typeBtn(type === 'income', '#10B981')} onClick={() => { setType('income'); setCategory(cats[0]?.id || 'salary'); }}>💚 수입</button>
+            <button style={s.typeBtn(type === 'expense', '#F87171')} onClick={() => { setType('expense'); setCategory(cats[0]?.id || 'food'); }}>❤️ 지출</button>
+          </div>
 
-        <div style={s.label}>카테고리</div>
-        <select style={s.select} value={category} onChange={(e) => setCategory(e.target.value)}>
-          {cats.map((c) => <option key={c.id} value={c.id}>{c.icon} {c.name}</option>)}
-        </select>
+          <div style={s.label}>금액 (원)</div>
+          <input style={s.input} type="tel" inputMode="numeric" placeholder="0"
+            value={amount ? parseInt(amount).toLocaleString() : ''}
+            onChange={(e) => setAmount(e.target.value.replace(/[^0-9]/g, ''))} />
 
-        <div style={s.label}>메모</div>
-        <input style={s.input} type="text" placeholder="메모 (선택)" value={description} onChange={(e) => setDescription(e.target.value)} maxLength={50} />
+          <div style={s.label}>카테고리</div>
+          <select style={s.select} value={category} onChange={(e) => setCategory(e.target.value)}>
+            {cats.map((c) => <option key={c.id} value={c.id}>{c.icon} {c.name}</option>)}
+          </select>
 
-        <div style={s.label}>반복 주기</div>
-        <select style={s.select} value={frequency} onChange={(e) => setFrequency(e.target.value)}>
-          <option value="daily">매일</option>
-          <option value="weekly">매주</option>
-          <option value="monthly">매월</option>
-        </select>
+          <div style={s.label}>메모</div>
+          <input style={s.input} type="text" placeholder="메모 (선택)" value={description} onChange={(e) => setDescription(e.target.value)} maxLength={50} />
 
-        {frequency === 'weekly' && (
-          <>
-            <div style={s.label}>요일</div>
-            <select style={s.select} value={dayOfWeek} onChange={(e) => setDayOfWeek(Number(e.target.value))}>
-              {[0,1,2,3,4,5,6].map((d) => <option key={d} value={d}>{getWeekDayName(d)}요일</option>)}
-            </select>
-          </>
-        )}
-        {frequency === 'monthly' && (
-          <>
-            <div style={s.label}>날짜</div>
-            <select style={s.select} value={dayOfMonth} onChange={(e) => setDayOfMonth(Number(e.target.value))}>
-              {Array.from({ length: 28 }, (_, i) => <option key={i+1} value={i+1}>{i+1}일</option>)}
-            </select>
-          </>
-        )}
+          <div style={s.label}>반복 주기</div>
+          <select style={s.select} value={frequency} onChange={(e) => setFrequency(e.target.value)}>
+            <option value="daily">매일</option>
+            <option value="weekly">매주</option>
+            <option value="monthly">매월</option>
+          </select>
 
-        <div style={s.btnRow}>
-          <button style={s.cancelBtn} onClick={onClose}>취소</button>
-          <button style={{ ...s.saveBtn, opacity: !amount ? 0.5 : 1 }} onClick={handleSave} disabled={!amount}>저장</button>
+          {frequency === 'weekly' && (
+            <>
+              <div style={s.label}>요일</div>
+              <select style={s.select} value={dayOfWeek} onChange={(e) => setDayOfWeek(Number(e.target.value))}>
+                {[0,1,2,3,4,5,6].map((d) => <option key={d} value={d}>{getWeekDayName(d)}요일</option>)}
+              </select>
+            </>
+          )}
+          {frequency === 'monthly' && (
+            <>
+              <div style={s.label}>날짜</div>
+              <select style={s.select} value={dayOfMonth} onChange={(e) => setDayOfMonth(Number(e.target.value))}>
+                {Array.from({ length: 28 }, (_, i) => <option key={i+1} value={i+1}>{i+1}일</option>)}
+              </select>
+            </>
+          )}
+        </div>
+
+        <div style={s.sheetFooter}>
+          <div style={s.btnRow}>
+            <button style={s.cancelBtn} onClick={onClose}>취소</button>
+            <button style={{ ...s.saveBtn, opacity: !amount ? 0.5 : 1 }} onClick={handleSave} disabled={!amount}>저장</button>
+          </div>
         </div>
       </div>
     </div>

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { formatKRW, calcCategorySpend, getMonthTransactions } from '../utils/helpers';
-import { getExpenseCategories } from '../utils/categories';
 
 const s = {
   wrap: { padding: '16px 16px 80px' },
@@ -78,12 +77,12 @@ function getBarColor(pct) {
   return '#10B981';
 }
 
-export default function BudgetScreen({ budgets, onUpdateBudget, transactions, year, month }) {
+export default function BudgetScreen({ budgets, onUpdateBudget, transactions, year, month, categories }) {
   const [focused, setFocused] = useState(null);
   const [localValues, setLocalValues] = useState({});
   const monthTxs = getMonthTransactions(transactions, year, month);
   const categorySpend = calcCategorySpend(monthTxs);
-  const expenseCats = getExpenseCategories();
+  const expenseCats = categories.filter((c) => c.type === 'expense');
 
   const handleChange = (id, val) => {
     const raw = val.replace(/[^0-9]/g, '');

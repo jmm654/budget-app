@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Header from './components/Header';
 import TabBar from './components/TabBar';
 import Dashboard from './components/Dashboard';
@@ -11,7 +11,9 @@ import {
   loadTransactions, saveTransactions,
   loadBudgets, saveBudgets,
   loadRecurring, saveRecurring,
+  loadCustomCategories, saveCustomCategories,
 } from './utils/storage';
+import { CATEGORIES } from './utils/categories';
 import { applyRecurring, calcCategorySpend, getMonthTransactions, generateId } from './utils/helpers';
 
 const NOTIFICATION_DURATION = 4000;
@@ -60,14 +62,19 @@ export default function App() {
   const [transactions, setTransactions] = useState(() => loadTransactions());
   const [budgets, setBudgets] = useState(() => loadBudgets());
   const [recurring, setRecurring] = useState(() => loadRecurring());
+  const [customCategories, setCustomCategories] = useState(() => loadCustomCategories());
   const [toast, setToast] = useState({ message: '', visible: false });
+
+  const allCategories = useMemo(
+    () => [...CATEGORIES, ...customCategories],
+    [customCategories]
+  );
 
   const showToast = useCallback((message) => {
     setToast({ message, visible: true });
     setTimeout(() => setToast((t) => ({ ...t, visible: false })), NOTIFICATION_DURATION);
   }, []);
 
-  // Apply recurring expenses on load
   useEffect(() => {
     const recurringList = loadRecurring();
     const existing = loadTransactions();
@@ -80,7 +87,7 @@ export default function App() {
     }
   }, [showToast]);
 
-  const checkBudgetAlert = useCallback((updatedTxs, savedTx) => {
+  const checkBudgetAlert = useCallback((updatedTxs, savedTx, cats) => {
     if (savedTx.type !== 'expense') return;
     const budget = budgets[savedTx.category];
     if (!budget) return;
@@ -90,10 +97,11 @@ export default function App() {
     const spend = calcCategorySpend(monthTxs);
     const spent = spend[savedTx.category] || 0;
     const pct = (spent / budget) * 100;
+    const catName = cats.find((c) => c.id === savedTx.category)?.name || savedTx.category;
     if (pct >= 100) {
-      showToast(`🚨 ${savedTx.category === 'food' ? '식비' : savedTx.category} 예산을 초과했습니다! (${Math.round(pct)}%)`);
+      showToast(`🚨 ${catName} 예산을 초과했습니다! (${Math.round(pct)}%)`);
     } else if (pct >= 80) {
-      showToast(`⚠️ ${savedTx.category === 'food' ? '식비' : savedTx.category} 예산의 ${Math.round(pct)}%에 도달했습니다`);
+      showToast(`⚠️ ${catName} 예산의 ${Math.round(pct)}%에 도달했습니다`);
     }
   }, [budgets, showToast]);
 
@@ -102,13 +110,13 @@ export default function App() {
       const exists = prev.find((t) => t.id === tx.id);
       const updated = exists ? prev.map((t) => (t.id === tx.id ? tx : t)) : [...prev, tx];
       saveTransactions(updated);
-      checkBudgetAlert(updated, tx);
+      checkBudgetAlert(updated, tx, allCategories);
       return updated;
     });
     setShowForm(false);
     setEditingId(null);
-    showToast(tx.id && transactions.find((t) => t.id === tx.id) ? '✓ 수정되었습니다' : '✓ 추가되었습니다');
-  }, [checkBudgetAlert, showToast, transactions]);
+    showToast(transactions.find((t) => t.id === tx.id) ? '✓ 수정되었습니다' : '✓ 추가되었습니다');
+  }, [checkBudgetAlert, showToast, transactions, allCategories]);
 
   const handleDeleteTransaction = useCallback((id) => {
     if (!window.confirm('이 내역을 삭제할까요?')) return;
@@ -161,6 +169,25 @@ export default function App() {
     showToast('✓ 반복 내역이 삭제되었습니다');
   }, [showToast]);
 
+  const handleAddCategory = useCallback((cat) => {
+    setCustomCategories((prev) => {
+      const updated = [...prev, { ...cat, isCustom: true }];
+      saveCustomCategories(updated);
+      return updated;
+    });
+    showToast('✓ 카테고리가 추가되었습니다');
+  }, [showToast]);
+
+  const handleDeleteCategory = useCallback((id) => {
+    if (!window.confirm('이 카테고리를 삭제할까요?\n해당 카테고리의 기존 내역은 유지됩니다.')) return;
+    setCustomCategories((prev) => {
+      const updated = prev.filter((c) => c.id !== id);
+      saveCustomCategories(updated);
+      return updated;
+    });
+    showToast('✓ 카테고리가 삭제되었습니다');
+  }, [showToast]);
+
   const handlePrevMonth = () => {
     if (month === 0) { setYear((y) => y - 1); setMonth(11); }
     else setMonth((m) => m - 1);
@@ -179,12 +206,7 @@ export default function App() {
 
   const isCurrentMonth = year === now.getFullYear() && month === now.getMonth();
 
-  const handleAddClick = () => {
-    setEditingId(null);
-    setShowForm(true);
-  };
-
-  const screenProps = { transactions, year, month };
+  const screenProps = { transactions, year, month, categories: allCategories };
 
   return (
     <>
@@ -203,7 +225,7 @@ export default function App() {
             {...screenProps}
             budgets={budgets}
             onEdit={handleEditTransaction}
-            onAddClick={handleAddClick}
+            onAddClick={() => { setEditingId(null); setShowForm(true); }}
           />
         )}
         {activeTab === 1 && (
@@ -211,7 +233,7 @@ export default function App() {
             {...screenProps}
             onEdit={handleEditTransaction}
             onDelete={handleDeleteTransaction}
-            onAddClick={handleAddClick}
+            onAddClick={() => { setEditingId(null); setShowForm(true); }}
           />
         )}
         {activeTab === 2 && (
@@ -226,10 +248,13 @@ export default function App() {
         )}
         {activeTab === 4 && (
           <SettingsScreen
+            categories={allCategories}
             recurring={recurring}
             onAddRecurring={handleAddRecurring}
             onToggleRecurring={handleToggleRecurring}
             onDeleteRecurring={handleDeleteRecurring}
+            onAddCategory={handleAddCategory}
+            onDeleteCategory={handleDeleteCategory}
           />
         )}
       </main>
@@ -240,6 +265,7 @@ export default function App() {
         <TransactionForm
           editingId={editingId}
           transactions={transactions}
+          categories={allCategories}
           onSave={handleSaveTransaction}
           onClose={() => { setShowForm(false); setEditingId(null); }}
         />

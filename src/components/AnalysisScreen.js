@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { formatKRW, calcSummary, calcCumulativeBalance, calcCategorySpend, getDailySpend, getMonthTransactions, getDaysInMonth } from '../utils/helpers';
-import { getExpenseCategories, getCategoryById } from '../utils/categories';
 
 const s = {
   wrap: { padding: '16px 16px 80px' },
@@ -58,7 +57,7 @@ const s = {
   legendLabel: { fontSize: 12, color: '#9CA3AF' },
 };
 
-export default function AnalysisScreen({ transactions, year, month }) {
+export default function AnalysisScreen({ transactions, year, month, categories }) {
   const monthTxs = getMonthTransactions(transactions, year, month);
   const { income, expense } = calcSummary(monthTxs);
   const balance = calcCumulativeBalance(transactions, year, month);
@@ -70,7 +69,7 @@ export default function AnalysisScreen({ transactions, year, month }) {
   const todayIdx = isCurrentMonth ? today.getDate() - 1 : -1;
 
   const topCats = useMemo(() => {
-    return getExpenseCategories()
+    return categories.filter((c) => c.type === 'expense')
       .map((cat) => ({ ...cat, amount: categorySpend[cat.id] || 0 }))
       .filter((c) => c.amount > 0)
       .sort((a, b) => b.amount - a.amount);

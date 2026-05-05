@@ -28,3 +28,6 @@ export const saveBudgets = (budgets) => save(KEYS.BUDGETS, budgets);
 
 export const loadRecurring = () => load(KEYS.RECURRING, []);
 export const saveRecurring = (recurring) => save(KEYS.RECURRING, recurring);
+
+export const loadCustomCategories = () => load(KEYS.CUSTOM_CATEGORIES, []);
+export const saveCustomCategories = (cats) => save(KEYS.CUSTOM_CATEGORIES, cats);

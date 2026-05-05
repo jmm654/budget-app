@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { formatKRW, formatDate, getMonthTransactions } from '../utils/helpers';
-import { getCategoryById, CATEGORIES } from '../utils/categories';
 
 const s = {
   wrap: { padding: '12px 16px 20px' },
@@ -97,7 +96,8 @@ const s = {
   },
 };
 
-export default function TransactionList({ transactions, year, month, onEdit, onDelete, onAddClick }) {
+export default function TransactionList({ transactions, year, month, categories, onEdit, onDelete, onAddClick }) {
+  const getCat = (id) => categories.find((c) => c.id === id) || categories[categories.length - 1];
   const [typeFilter, setTypeFilter] = useState('all');
   const [catFilter, setCatFilter] = useState('all');
   const [search, setSearch] = useState('');
@@ -110,7 +110,7 @@ export default function TransactionList({ transactions, year, month, onEdit, onD
       .filter((t) => catFilter === 'all' || t.category === catFilter)
       .filter((t) => {
         if (!search) return true;
-        const cat = getCategoryById(t.category);
+        const cat = getCat(t.category);
         return (
           t.description.toLowerCase().includes(search.toLowerCase()) ||
           cat.name.includes(search)
@@ -130,8 +130,8 @@ export default function TransactionList({ transactions, year, month, onEdit, onD
 
   const usedCats = useMemo(() => {
     const ids = new Set(monthTxs.map((t) => t.category));
-    return CATEGORIES.filter((c) => ids.has(c.id));
-  }, [monthTxs]);
+    return categories.filter((c) => ids.has(c.id));
+  }, [monthTxs, categories]);
 
   return (
     <div style={s.wrap}>
@@ -166,7 +166,7 @@ export default function TransactionList({ transactions, year, month, onEdit, onD
           <div key={date} style={s.dateGroup}>
             <div style={s.dateLabel}>{formatDate(date)}</div>
             {txs.map((tx) => {
-              const cat = getCategoryById(tx.category);
+              const cat = getCat(tx.category);
               return (
                 <div key={tx.id} style={s.txRow}>
                   <div style={s.icon(cat.color)} onClick={() => onEdit(tx.id)}>{cat.icon}</div>

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { getTodayStr, generateId } from '../utils/helpers';
-import { CATEGORIES, getCategoryById } from '../utils/categories';
 
 const s = {
   overlay: {
@@ -105,7 +104,7 @@ const s = {
   },
 };
 
-export default function TransactionForm({ editingId, transactions, onSave, onClose }) {
+export default function TransactionForm({ editingId, transactions, categories, onSave, onClose }) {
   const today = getTodayStr();
   const [type, setType] = useState('expense');
   const [amount, setAmount] = useState('');
@@ -131,7 +130,7 @@ export default function TransactionForm({ editingId, transactions, onSave, onClo
     setCategory(defaultCat);
   }, [type]);
 
-  const filteredCats = CATEGORIES.filter((c) => c.type === type);
+  const filteredCats = categories.filter((c) => c.type === type);
 
   const handleAmountChange = (e) => {
     const raw = e.target.value.replace(/[^0-9]/g, '');

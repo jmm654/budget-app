@@ -1,6 +1,5 @@
 import React from 'react';
 import { formatKRW, formatDate, calcSummary, calcCumulativeBalance, calcCategorySpend, getMonthTransactions } from '../utils/helpers';
-import { getCategoryById, getExpenseCategories } from '../utils/categories';
 
 const s = {
   wrap: { padding: '16px 16px 20px' },
@@ -100,14 +99,15 @@ const s = {
   emptyText: { textAlign: 'center', color: '#6B7280', fontSize: 14, padding: '20px 0' },
 };
 
-export default function Dashboard({ transactions, budgets, year, month, onEdit, onAddClick }) {
+export default function Dashboard({ transactions, budgets, year, month, categories, onEdit, onAddClick }) {
+  const getCat = (id) => categories.find((c) => c.id === id) || categories[categories.length - 1];
   const monthTxs = getMonthTransactions(transactions, year, month);
   const { income, expense } = calcSummary(monthTxs);
   const balance = calcCumulativeBalance(transactions, year, month);
   const categorySpend = calcCategorySpend(monthTxs);
   const recent = [...monthTxs].sort((a, b) => b.date.localeCompare(a.date) || b.createdAt - a.createdAt).slice(0, 5);
 
-  const budgetAlerts = getExpenseCategories()
+  const budgetAlerts = categories.filter((c) => c.type === 'expense')
     .filter((cat) => budgets[cat.id] && categorySpend[cat.id])
     .map((cat) => {
       const pct = (categorySpend[cat.id] / budgets[cat.id]) * 100;
@@ -176,7 +176,7 @@ export default function Dashboard({ transactions, budgets, year, month, onEdit, 
           <div style={s.emptyText}>내역이 없습니다.<br />+ 버튼으로 추가해보세요!</div>
         ) : (
           recent.map((tx) => {
-            const cat = getCategoryById(tx.category);
+            const cat = getCat(tx.category);
             return (
               <div key={tx.id} style={s.txItem} onClick={() => onEdit(tx.id)}>
                 <div style={s.txIcon(cat.color)}>{cat.icon}</div>

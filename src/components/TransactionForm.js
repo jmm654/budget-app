@@ -19,6 +19,8 @@ const s = {
     padding: '0 16px calc(16px + env(safe-area-inset-bottom, 0px))',
     maxHeight: '92vh',
     overflowY: 'auto',
+    WebkitOverflowScrolling: 'touch',
+    overscrollBehavior: 'contain',
   },
   handle: {
     width: 40,

@@ -156,13 +156,13 @@ const s = {
   toggleBtn: (active) => ({ flex:1, padding:'8px', borderRadius:8, background: active ? 'rgba(16,185,129,0.15)' : 'rgba(107,114,128,0.15)', color: active ? '#10B981' : '#6B7280', fontSize:12, fontWeight:600, border:`1px solid ${active ? '#10B981' : '#3D3D3D'}`, cursor:'pointer' }),
   deleteBtn: { padding:'8px 12px', borderRadius:8, background:'rgba(239,68,68,0.1)', color:'#EF4444', fontSize:12, fontWeight:600, border:'1px solid rgba(239,68,68,0.3)', cursor:'pointer' },
   emptyWrap: { textAlign:'center', color:'#6B7280', padding:'24px 0', fontSize:13 },
-  overlay: { position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', zIndex:200, display:'flex', alignItems:'flex-end', justifyContent:'center' },
-  sheet: { width:'100%', maxWidth:430, background:'#141414', borderRadius:'20px 20px 0 0', maxHeight:'88vh', display:'flex', flexDirection:'column' },
-  sheetHeader: { padding:'0 16px', flexShrink:0 },
-  scrollContent: { flex:1, overflowY:'scroll', WebkitOverflowScrolling:'touch', overscrollBehavior:'contain', padding:'0 16px 8px' },
-  sheetFooter: { flexShrink:0, padding:'12px 16px calc(20px + env(safe-area-inset-bottom,0px))' },
-  handle: { width:40, height:4, borderRadius:2, background:'#3D3D3D', margin:'12px auto 16px' },
-  sheetTitle: { fontSize:17, fontWeight:700, color:'#F9FAFB', marginBottom:20, textAlign:'center' },
+  overlay: { position:'fixed', inset:0, background:'#0A0A0A', zIndex:200, display:'flex', flexDirection:'column' },
+  sheetHeader: { display:'flex', alignItems:'center', padding:'calc(env(safe-area-inset-top,0px) + 12px) 16px 12px', flexShrink:0, borderBottom:'1px solid #2D2D2D' },
+  backBtn: { width:36, height:36, borderRadius:10, background:'#1E1E1E', border:'1px solid #2D2D2D', color:'#F9FAFB', fontSize:18, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', flexShrink:0 },
+  sheetTitle: { flex:1, fontSize:17, fontWeight:700, color:'#F9FAFB', textAlign:'center' },
+  sheetTitleSpacer: { width:36, flexShrink:0 },
+  scrollContent: { flex:1, overflowY:'scroll', WebkitOverflowScrolling:'touch', overscrollBehavior:'contain', padding:'20px 16px 8px' },
+  sheetFooter: { flexShrink:0, padding:'12px 16px calc(20px + env(safe-area-inset-bottom,0px))', borderTop:'1px solid #2D2D2D' },
   label: { fontSize:13, fontWeight:600, color:'#9CA3AF', marginBottom:8 },
   input: { width:'100%', background:'#1E1E1E', border:'1px solid #2D2D2D', borderRadius:10, padding:'12px 14px', color:'#F9FAFB', fontSize:15, marginBottom:14 },
   select: { width:'100%', background:'#1E1E1E', border:'1px solid #2D2D2D', borderRadius:10, padding:'12px 14px', color:'#F9FAFB', fontSize:15, marginBottom:14, appearance:'none' },
@@ -207,12 +207,12 @@ function AddRecurringForm({ categories, onSave, onClose }) {
   };
 
   return (
-    <div style={s.overlay} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div style={s.sheet}>
-        <div style={s.sheetHeader}>
-          <div style={s.handle} />
-          <div style={s.sheetTitle}>반복 내역 추가</div>
-        </div>
+    <div style={s.overlay}>
+      <div style={s.sheetHeader}>
+        <button style={s.backBtn} onClick={onClose}>‹</button>
+        <div style={s.sheetTitle}>반복 내역 추가</div>
+        <div style={s.sheetTitleSpacer} />
+      </div>
 
         <div style={s.scrollContent}>
           <div style={s.label}>수입/지출</div>
@@ -265,7 +265,6 @@ function AddRecurringForm({ categories, onSave, onClose }) {
             <button style={{ ...s.saveBtn, opacity: !amount ? 0.5 : 1 }} onClick={handleSave} disabled={!amount}>저장</button>
           </div>
         </div>
-      </div>
     </div>
   );
 }

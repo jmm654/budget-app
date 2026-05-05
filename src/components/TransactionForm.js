@@ -10,6 +10,7 @@ const s = {
     display: 'flex',
     alignItems: 'flex-end',
     justifyContent: 'center',
+    overflow: 'hidden',
   },
   sheet: {
     width: '100%',
@@ -18,9 +19,10 @@ const s = {
     borderRadius: '20px 20px 0 0',
     padding: '0 16px calc(16px + env(safe-area-inset-bottom, 0px))',
     maxHeight: '92vh',
-    overflowY: 'auto',
+    overflowY: 'scroll',
     WebkitOverflowScrolling: 'touch',
     overscrollBehavior: 'contain',
+    touchAction: 'pan-y',
   },
   handle: {
     width: 40,

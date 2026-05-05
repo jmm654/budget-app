@@ -12,8 +12,8 @@ const PRESET_ICONS = ['🍕','🍺','🎮','🐶','🐱','✈️','🚗','⛽','
 
 /* ─── 카테고리 추가 폼 ─── */
 const catFormS = {
-  overlay: { position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', zIndex:300, display:'flex', alignItems:'flex-end', justifyContent:'center' },
-  sheet: { width:'100%', maxWidth:430, background:'#141414', borderRadius:'20px 20px 0 0', padding:'0 16px calc(24px + env(safe-area-inset-bottom,0px))', maxHeight:'90vh', overflowY:'auto', WebkitOverflowScrolling:'touch', overscrollBehavior:'contain' },
+  overlay: { position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', zIndex:300, display:'flex', alignItems:'flex-end', justifyContent:'center', overflow:'hidden' },
+  sheet: { width:'100%', maxWidth:430, background:'#141414', borderRadius:'20px 20px 0 0', padding:'0 16px calc(24px + env(safe-area-inset-bottom,0px))', maxHeight:'90vh', overflowY:'scroll', WebkitOverflowScrolling:'touch', overscrollBehavior:'contain', touchAction:'pan-y' },
   handle: { width:40, height:4, borderRadius:2, background:'#3D3D3D', margin:'12px auto 16px' },
   title: { fontSize:17, fontWeight:700, color:'#F9FAFB', textAlign:'center', marginBottom:20 },
   label: { fontSize:13, fontWeight:600, color:'#9CA3AF', marginBottom:8 },
@@ -146,8 +146,8 @@ const s = {
   toggleBtn: (active) => ({ flex:1, padding:'8px', borderRadius:8, background: active ? 'rgba(16,185,129,0.15)' : 'rgba(107,114,128,0.15)', color: active ? '#10B981' : '#6B7280', fontSize:12, fontWeight:600, border:`1px solid ${active ? '#10B981' : '#3D3D3D'}`, cursor:'pointer' }),
   deleteBtn: { padding:'8px 12px', borderRadius:8, background:'rgba(239,68,68,0.1)', color:'#EF4444', fontSize:12, fontWeight:600, border:'1px solid rgba(239,68,68,0.3)', cursor:'pointer' },
   emptyWrap: { textAlign:'center', color:'#6B7280', padding:'24px 0', fontSize:13 },
-  overlay: { position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', zIndex:200, display:'flex', alignItems:'flex-end', justifyContent:'center' },
-  sheet: { width:'100%', maxWidth:430, background:'#141414', borderRadius:'20px 20px 0 0', padding:'0 16px calc(20px + env(safe-area-inset-bottom,0px))', maxHeight:'88vh', overflowY:'auto', WebkitOverflowScrolling:'touch', overscrollBehavior:'contain' },
+  overlay: { position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', zIndex:200, display:'flex', alignItems:'flex-end', justifyContent:'center', overflow:'hidden' },
+  sheet: { width:'100%', maxWidth:430, background:'#141414', borderRadius:'20px 20px 0 0', padding:'0 16px calc(20px + env(safe-area-inset-bottom,0px))', maxHeight:'88vh', overflowY:'scroll', WebkitOverflowScrolling:'touch', overscrollBehavior:'contain', touchAction:'pan-y' },
   handle: { width:40, height:4, borderRadius:2, background:'#3D3D3D', margin:'12px auto 16px' },
   sheetTitle: { fontSize:17, fontWeight:700, color:'#F9FAFB', marginBottom:20, textAlign:'center' },
   label: { fontSize:13, fontWeight:600, color:'#9CA3AF', marginBottom:8 },

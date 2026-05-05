@@ -125,6 +125,12 @@ export default function TransactionForm({ editingId, transactions, categories, o
   const [date, setDate] = useState(today);
 
   useEffect(() => {
+    const screens = document.querySelectorAll('.screen');
+    screens.forEach((el) => { el.style.overflowY = 'hidden'; });
+    return () => { screens.forEach((el) => { el.style.overflowY = ''; }); };
+  }, []);
+
+  useEffect(() => {
     if (editingId) {
       const tx = transactions.find((t) => t.id === editingId);
       if (tx) {

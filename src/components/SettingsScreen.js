@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { formatKRW, generateId, getTodayStr, getWeekDayName } from '../utils/helpers';
 import { CATEGORIES } from '../utils/categories';
 
@@ -40,6 +40,12 @@ function CategoryForm({ onSave, onClose }) {
   const [icon, setIcon] = useState('🎯');
   const [customIcon, setCustomIcon] = useState('');
   const [color, setColor] = useState(PRESET_COLORS[0]);
+
+  useEffect(() => {
+    const screens = document.querySelectorAll('.screen');
+    screens.forEach((el) => { el.style.overflowY = 'hidden'; });
+    return () => { screens.forEach((el) => { el.style.overflowY = ''; }); };
+  }, []);
 
   const finalIcon = customIcon.trim() || icon;
   const canSave = name.trim().length > 0;
@@ -175,6 +181,12 @@ function AddRecurringForm({ categories, onSave, onClose }) {
   const [frequency, setFrequency] = useState('monthly');
   const [dayOfWeek, setDayOfWeek] = useState(1);
   const [dayOfMonth, setDayOfMonth] = useState(1);
+
+  useEffect(() => {
+    const screens = document.querySelectorAll('.screen');
+    screens.forEach((el) => { el.style.overflowY = 'hidden'; });
+    return () => { screens.forEach((el) => { el.style.overflowY = ''; }); };
+  }, []);
 
   const cats = categories.filter((c) => c.type === type);
   const getCat = (id) => categories.find((c) => c.id === id) || categories[categories.length - 1];

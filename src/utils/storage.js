@@ -2,6 +2,7 @@ const KEYS = {
   TRANSACTIONS: 'budget_transactions',
   BUDGETS: 'budget_budgets',
   RECURRING: 'budget_recurring',
+  CUSTOM_CATEGORIES: 'budget_custom_categories',
 };
 
 const load = (key, fallback) => {

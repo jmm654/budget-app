@@ -33,6 +33,15 @@ export const calcSummary = (transactions) => {
   return { income, expense, balance: income - expense };
 };
 
+// 선택한 달 말일까지의 모든 거래를 합산한 누적 잔액
+export const calcCumulativeBalance = (transactions, year, month) => {
+  const nextMonth = month === 11
+    ? `${year + 1}-01`
+    : `${year}-${String(month + 2).padStart(2, '0')}`;
+  const past = transactions.filter((t) => t.date < nextMonth);
+  return calcSummary(past).balance;
+};
+
 export const calcCategorySpend = (transactions) => {
   const map = {};
   transactions

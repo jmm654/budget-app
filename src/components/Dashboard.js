@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatKRW, formatDate, calcSummary, calcCategorySpend, getMonthTransactions } from '../utils/helpers';
+import { formatKRW, formatDate, calcSummary, calcCumulativeBalance, calcCategorySpend, getMonthTransactions } from '../utils/helpers';
 import { getCategoryById, getExpenseCategories } from '../utils/categories';
 
 const s = {
@@ -102,7 +102,8 @@ const s = {
 
 export default function Dashboard({ transactions, budgets, year, month, onEdit, onAddClick }) {
   const monthTxs = getMonthTransactions(transactions, year, month);
-  const { income, expense, balance } = calcSummary(monthTxs);
+  const { income, expense } = calcSummary(monthTxs);
+  const balance = calcCumulativeBalance(transactions, year, month);
   const categorySpend = calcCategorySpend(monthTxs);
   const recent = [...monthTxs].sort((a, b) => b.date.localeCompare(a.date) || b.createdAt - a.createdAt).slice(0, 5);
 
@@ -120,7 +121,7 @@ export default function Dashboard({ transactions, budgets, year, month, onEdit, 
       {/* Balance Card */}
       <div style={s.balanceCard}>
         <div>
-          <div style={s.balanceLabel}>이번 달 잔액</div>
+          <div style={s.balanceLabel}>누적 잔액 (이월)</div>
           <div style={s.balanceAmount}>{formatKRW(balance)}</div>
         </div>
         <span style={{ fontSize: 36 }}>💰</span>

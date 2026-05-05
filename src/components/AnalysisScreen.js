@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { formatKRW, calcSummary, calcCategorySpend, getDailySpend, getMonthTransactions, getDaysInMonth } from '../utils/helpers';
+import { formatKRW, calcSummary, calcCumulativeBalance, calcCategorySpend, getDailySpend, getMonthTransactions, getDaysInMonth } from '../utils/helpers';
 import { getExpenseCategories, getCategoryById } from '../utils/categories';
 
 const s = {
@@ -60,7 +60,8 @@ const s = {
 
 export default function AnalysisScreen({ transactions, year, month }) {
   const monthTxs = getMonthTransactions(transactions, year, month);
-  const { income, expense, balance } = calcSummary(monthTxs);
+  const { income, expense } = calcSummary(monthTxs);
+  const balance = calcCumulativeBalance(transactions, year, month);
   const categorySpend = calcCategorySpend(monthTxs);
   const dailySpend = getDailySpend(monthTxs, year, month);
   const days = getDaysInMonth(year, month);
@@ -91,7 +92,7 @@ export default function AnalysisScreen({ transactions, year, month }) {
           <div style={s.sAmount('#F87171')}>{formatKRW(expense)}</div>
         </div>
         <div style={s.sCard('#A78BFA', 'rgba(167,139,250,0.08)')}>
-          <div style={s.sLabel}>잔액</div>
+          <div style={s.sLabel}>누적 잔액</div>
           <div style={s.sAmount(balance >= 0 ? '#A78BFA' : '#F87171')}>{formatKRW(balance)}</div>
         </div>
       </div>

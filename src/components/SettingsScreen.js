@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import { formatKRW, generateId, getTodayStr, getWeekDayName } from '../utils/helpers';
 import { CATEGORIES } from '../utils/categories';
 
@@ -61,7 +62,7 @@ function CategoryForm({ onSave, onClose }) {
     });
   };
 
-  return (
+  return ReactDOM.createPortal(
     <div style={catFormS.overlay} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div style={catFormS.sheet}>
         <div style={catFormS.sheetHeader}>
@@ -119,7 +120,8 @@ function CategoryForm({ onSave, onClose }) {
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -206,7 +208,7 @@ function AddRecurringForm({ categories, onSave, onClose }) {
     });
   };
 
-  return (
+  return ReactDOM.createPortal(
     <div style={s.overlay}>
       <div style={s.sheetHeader}>
         <button style={s.backBtn} onClick={onClose}>‹</button>
@@ -265,7 +267,8 @@ function AddRecurringForm({ categories, onSave, onClose }) {
             <button style={{ ...s.saveBtn, opacity: !amount ? 0.5 : 1 }} onClick={handleSave} disabled={!amount}>저장</button>
           </div>
         </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

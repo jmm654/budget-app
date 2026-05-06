@@ -6,7 +6,7 @@ import TransactionList from './components/TransactionList';
 import TransactionForm from './components/TransactionForm';
 import BudgetScreen from './components/BudgetScreen';
 import AnalysisScreen from './components/AnalysisScreen';
-import SettingsScreen from './components/SettingsScreen';
+import SettingsScreen, { CategoryForm, AddRecurringForm } from './components/SettingsScreen';
 import {
   loadTransactions, saveTransactions,
   loadBudgets, saveBudgets,
@@ -64,6 +64,8 @@ export default function App() {
   const [recurring, setRecurring] = useState(() => loadRecurring());
   const [customCategories, setCustomCategories] = useState(() => loadCustomCategories());
   const [toast, setToast] = useState({ message: '', visible: false });
+  const [showCategoryForm, setShowCategoryForm] = useState(false);
+  const [showRecurringForm, setShowRecurringForm] = useState(false);
 
   const allCategories = useMemo(
     () => [...CATEGORIES, ...customCategories],
@@ -255,6 +257,8 @@ export default function App() {
             onDeleteRecurring={handleDeleteRecurring}
             onAddCategory={handleAddCategory}
             onDeleteCategory={handleDeleteCategory}
+            onShowCategoryForm={() => setShowCategoryForm(true)}
+            onShowRecurringForm={() => setShowRecurringForm(true)}
           />
         )}
       </main>
@@ -268,6 +272,21 @@ export default function App() {
           categories={allCategories}
           onSave={handleSaveTransaction}
           onClose={() => { setShowForm(false); setEditingId(null); }}
+        />
+      )}
+
+      {showCategoryForm && (
+        <CategoryForm
+          onSave={(cat) => { handleAddCategory(cat); setShowCategoryForm(false); }}
+          onClose={() => setShowCategoryForm(false)}
+        />
+      )}
+
+      {showRecurringForm && (
+        <AddRecurringForm
+          categories={allCategories}
+          onSave={(r) => { handleAddRecurring(r); setShowRecurringForm(false); }}
+          onClose={() => setShowRecurringForm(false)}
         />
       )}
 

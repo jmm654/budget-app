@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import ReactDOM from 'react-dom';
 import { formatKRW, generateId, getTodayStr, getWeekDayName } from '../utils/helpers';
 import { CATEGORIES } from '../utils/categories';
 
@@ -62,7 +61,7 @@ function CategoryForm({ onSave, onClose }) {
     });
   };
 
-  return ReactDOM.createPortal(
+  return (
     <div style={catFormS.overlay} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div style={catFormS.sheet}>
         <div style={catFormS.sheetHeader}>
@@ -120,10 +119,10 @@ function CategoryForm({ onSave, onClose }) {
           </div>
         </div>
       </div>
-    </div>,
-    document.body
+    </div>
   );
 }
+export { CategoryForm };
 
 /* ─── 카테고리 관리 섹션 ─── */
 const catMgrS = {
@@ -208,7 +207,7 @@ function AddRecurringForm({ categories, onSave, onClose }) {
     });
   };
 
-  return ReactDOM.createPortal(
+  return (
     <div style={s.overlay}>
       <div style={s.sheetHeader}>
         <button style={s.backBtn} onClick={onClose}>‹</button>
@@ -267,15 +266,12 @@ function AddRecurringForm({ categories, onSave, onClose }) {
             <button style={{ ...s.saveBtn, opacity: !amount ? 0.5 : 1 }} onClick={handleSave} disabled={!amount}>저장</button>
           </div>
         </div>
-    </div>,
-    document.body
+    </div>
   );
 }
+export { AddRecurringForm };
 
-export default function SettingsScreen({ categories, recurring, onAddRecurring, onToggleRecurring, onDeleteRecurring, onAddCategory, onDeleteCategory }) {
-  const [showRecurringForm, setShowRecurringForm] = useState(false);
-  const [showCategoryForm, setShowCategoryForm] = useState(false);
-
+export default function SettingsScreen({ categories, recurring, onAddRecurring, onToggleRecurring, onDeleteRecurring, onAddCategory, onDeleteCategory, onShowCategoryForm, onShowRecurringForm }) {
   const getCat = (id) => categories.find((c) => c.id === id) || categories[categories.length - 1];
 
   const freqDetail = (r) => {
@@ -292,7 +288,7 @@ export default function SettingsScreen({ categories, recurring, onAddRecurring, 
       {/* ── 카테고리 관리 ── */}
       <div style={s.sectionTitle}>카테고리 관리</div>
 
-      <button style={catMgrS.addCatBtn} onClick={() => setShowCategoryForm(true)}>
+      <button style={catMgrS.addCatBtn} onClick={onShowCategoryForm}>
         ＋ 카테고리 직접 추가
       </button>
 
@@ -321,7 +317,7 @@ export default function SettingsScreen({ categories, recurring, onAddRecurring, 
       <div style={s.divider} />
 
       {/* ── 반복 내역 ── */}
-      <button style={s.addBtn} onClick={() => setShowRecurringForm(true)}>＋ 반복 내역 추가</button>
+      <button style={s.addBtn} onClick={onShowRecurringForm}>＋ 반복 내역 추가</button>
       <div style={s.sectionTitle}>반복 내역 목록 ({recurring.length})</div>
 
       {recurring.length === 0 ? (
@@ -353,19 +349,6 @@ export default function SettingsScreen({ categories, recurring, onAddRecurring, 
         })
       )}
 
-      {showCategoryForm && (
-        <CategoryForm
-          onSave={(cat) => { onAddCategory(cat); setShowCategoryForm(false); }}
-          onClose={() => setShowCategoryForm(false)}
-        />
-      )}
-      {showRecurringForm && (
-        <AddRecurringForm
-          categories={categories}
-          onSave={(r) => { onAddRecurring(r); setShowRecurringForm(false); }}
-          onClose={() => setShowRecurringForm(false)}
-        />
-      )}
     </div>
   );
 }

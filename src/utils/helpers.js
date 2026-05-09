@@ -18,26 +18,23 @@ export const getTodayStr = () => {
 export const getMonthStr = (year, month) =>
   `${year}-${String(month + 1).padStart(2, '0')}`;
 
-// 기간: 전월 25일 ~ 당월 24일
-const getPrevPeriod = (year, month) =>
-  month === 0 ? { year: year - 1, month: 11 } : { year, month: month - 1 };
+// 기간: 당월 25일 ~ 익월 24일  (예: 5월 = 5/25 ~ 6/24)
+export const getPeriodStart = (year, month) =>
+  `${year}-${String(month + 1).padStart(2, '0')}-25`;
 
-export const getPeriodStart = (year, month) => {
-  const { year: py, month: pm } = getPrevPeriod(year, month);
-  return `${py}-${String(pm + 1).padStart(2, '0')}-25`;
+export const getPeriodEnd = (year, month) => {
+  const ny = month === 11 ? year + 1 : year;
+  const nm = month === 11 ? 0 : month + 1;
+  return `${ny}-${String(nm + 1).padStart(2, '0')}-24`;
 };
 
-export const getPeriodEnd = (year, month) =>
-  `${year}-${String(month + 1).padStart(2, '0')}-24`;
-
 // 날짜가 속하는 기간 {year, month} 반환
+// 25일 이상 → 당월 기간 / 24일 이하 → 전월 기간
 export const getPeriodForDate = (dateStr) => {
   const [y, m, d] = dateStr.split('-').map(Number);
   const month0 = m - 1;
-  if (d >= 25) {
-    return month0 === 11 ? { year: y + 1, month: 0 } : { year: y, month: month0 + 1 };
-  }
-  return { year: y, month: month0 };
+  if (d >= 25) return { year: y, month: month0 };
+  return month0 === 0 ? { year: y - 1, month: 11 } : { year: y, month: month0 - 1 };
 };
 
 // 오늘 날짜가 속하는 기간 반환
@@ -64,7 +61,7 @@ export const calcSummary = (transactions) => {
   return { income, expense, balance: income - expense };
 };
 
-// 선택한 기간 말일(당월 24일)까지의 누적 잔액
+// 선택한 기간 말일(익월 24일)까지의 누적 잔액
 export const calcCumulativeBalance = (transactions, year, month) => {
   const end = getPeriodEnd(year, month);
   return calcSummary(transactions.filter((t) => t.date <= end)).balance;
@@ -82,42 +79,40 @@ export const calcCategorySpend = (transactions) => {
 
 export const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
 
-// 기간(전월 25일~당월 24일)의 총 일수 = 전월의 일수
-export const getDaysInPeriod = (year, month) => {
-  const { year: py, month: pm } = month === 0 ? { year: year - 1, month: 11 } : { year, month: month - 1 };
-  return getDaysInMonth(py, pm);
-};
+// 기간(당월 25일~익월 24일)의 총 일수 = 당월의 일수
+export const getDaysInPeriod = (year, month) => getDaysInMonth(year, month);
 
-// 차트 인덱스 i에 해당하는 실제 날짜 숫자 반환 (25→31, 1→24)
+// 차트 인덱스 i에 해당하는 실제 날짜 숫자 반환 (25→말일, 1→24)
 export const getPeriodDayLabel = (i, year, month) => {
-  const { year: py, month: pm } = month === 0 ? { year: year - 1, month: 11 } : { year, month: month - 1 };
-  const daysFromPrev = getDaysInMonth(py, pm) - 24;
-  return i < daysFromPrev ? 25 + i : i - daysFromPrev + 1;
+  const daysFromCurrent = getDaysInMonth(year, month) - 24;
+  return i < daysFromCurrent ? 25 + i : i - daysFromCurrent + 1;
 };
 
 // 오늘이 해당 기간에서 몇 번째 인덱스인지 반환 (기간 아니면 -1)
 export const getTodayPeriodIdx = (year, month) => {
   const today = new Date();
   const td = today.getDate(), tm = today.getMonth(), ty = today.getFullYear();
-  const { year: py, month: pm } = month === 0 ? { year: year - 1, month: 11 } : { year, month: month - 1 };
-  const daysFromPrev = getDaysInMonth(py, pm) - 24;
-  if (ty === py && tm === pm && td >= 25) return td - 25;
-  if (ty === year && tm === month && td <= 24) return daysFromPrev + td - 1;
+  const ny = month === 11 ? year + 1 : year;
+  const nm = month === 11 ? 0 : month + 1;
+  const daysFromCurrent = getDaysInMonth(year, month) - 24;
+  if (ty === year && tm === month && td >= 25) return td - 25;
+  if (ty === ny && tm === nm && td <= 24) return daysFromCurrent + td - 1;
   return -1;
 };
 
 export const getDailySpend = (transactions, year, month) => {
-  const { year: py, month: pm } = month === 0 ? { year: year - 1, month: 11 } : { year, month: month - 1 };
-  const daysFromPrev = getDaysInMonth(py, pm) - 24;
-  const daily = Array(daysFromPrev + 24).fill(0);
+  const daysFromCurrent = getDaysInMonth(year, month) - 24;
+  const ny = month === 11 ? year + 1 : year;
+  const nm = month === 11 ? 0 : month + 1;
+  const daily = Array(daysFromCurrent + 24).fill(0);
   transactions
     .filter((t) => t.type === 'expense')
     .forEach((t) => {
       const parts = t.date.split('-');
       const ty = parseInt(parts[0]), tm1 = parseInt(parts[1]), td = parseInt(parts[2]);
       const tm = tm1 - 1;
-      if (ty === py && tm === pm && td >= 25) daily[td - 25] += t.amount;
-      else if (ty === year && tm === month && td <= 24) daily[daysFromPrev + td - 1] += t.amount;
+      if (ty === year && tm === month && td >= 25) daily[td - 25] += t.amount;
+      else if (ty === ny && tm === nm && td <= 24) daily[daysFromCurrent + td - 1] += t.amount;
     });
   return daily;
 };

@@ -8,12 +8,15 @@ import BudgetScreen from './components/BudgetScreen';
 import AnalysisScreen from './components/AnalysisScreen';
 import SettingsScreen, { CategoryForm, AddRecurringForm } from './components/SettingsScreen';
 import AssetScreen, { AssetForm } from './components/AssetScreen';
+import LockScreen from './components/LockScreen';
+import PinFlow from './components/PinFlow';
 import {
   loadTransactions, saveTransactions,
   loadBudgets, saveBudgets,
   loadRecurring, saveRecurring,
   loadCustomCategories, saveCustomCategories,
   loadAssets, saveAssets,
+  loadSettings, saveSettings,
 } from './utils/storage';
 import { CATEGORIES } from './utils/categories';
 import { applyRecurring, calcCategorySpend, getMonthTransactions, generateId, getCurrentPeriod, getPeriodForDate } from './utils/helpers';
@@ -70,6 +73,9 @@ export default function App() {
   const [showRecurringForm, setShowRecurringForm] = useState(false);
   const [showAssetForm, setShowAssetForm] = useState(false);
   const [editingAsset, setEditingAsset] = useState(null);
+  const [settings, setSettings] = useState(() => loadSettings());
+  const [isLocked, setIsLocked] = useState(() => !!loadSettings().pinHash);
+  const [showPinFlow, setShowPinFlow] = useState(null);
 
   const allCategories = useMemo(
     () => [...CATEGORIES, ...customCategories],
@@ -79,6 +85,16 @@ export default function App() {
   const showToast = useCallback((message) => {
     setToast({ message, visible: true });
     setTimeout(() => setToast((t) => ({ ...t, visible: false })), NOTIFICATION_DURATION);
+  }, []);
+
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible' && loadSettings().pinHash) {
+        setIsLocked(true);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
   }, []);
 
   useEffect(() => {
@@ -210,6 +226,18 @@ export default function App() {
     setShowAssetForm(true);
   }, []);
 
+  const handlePinFlowComplete = useCallback((newHash) => {
+    setSettings((prev) => {
+      const updated = { ...prev };
+      if (newHash === null) delete updated.pinHash;
+      else updated.pinHash = newHash;
+      saveSettings(updated);
+      return updated;
+    });
+    setShowPinFlow(null);
+    showToast(newHash === null ? '✓ 비밀번호가 해제되었습니다' : '✓ 비밀번호가 설정되었습니다');
+  }, [showToast]);
+
   const handleDeleteCategory = useCallback((id) => {
     if (!window.confirm('이 카테고리를 삭제할까요?\n해당 카테고리의 기존 내역은 유지됩니다.')) return;
     setCustomCategories((prev) => {
@@ -239,6 +267,10 @@ export default function App() {
   const isCurrentMonth = (() => { const p = getCurrentPeriod(); return year === p.year && month === p.month; })();
 
   const screenProps = { transactions, year, month, categories: allCategories };
+
+  if (isLocked && settings.pinHash) {
+    return <LockScreen pinHash={settings.pinHash} onUnlock={() => setIsLocked(false)} />;
+  }
 
   return (
     <>
@@ -290,6 +322,8 @@ export default function App() {
             onDeleteCategory={handleDeleteCategory}
             onShowCategoryForm={() => setShowCategoryForm(true)}
             onShowRecurringForm={() => setShowRecurringForm(true)}
+            settings={settings}
+            onShowPinFlow={setShowPinFlow}
           />
         )}
         {activeTab === 5 && (
@@ -334,6 +368,15 @@ export default function App() {
           editingAsset={editingAsset}
           onSave={handleSaveAsset}
           onClose={() => { setShowAssetForm(false); setEditingAsset(null); }}
+        />
+      )}
+
+      {showPinFlow && (
+        <PinFlow
+          mode={showPinFlow}
+          currentHash={settings.pinHash || null}
+          onComplete={handlePinFlowComplete}
+          onClose={() => setShowPinFlow(null)}
         />
       )}
 

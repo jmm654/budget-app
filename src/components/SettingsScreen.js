@@ -271,7 +271,7 @@ function AddRecurringForm({ categories, onSave, onClose }) {
 }
 export { AddRecurringForm };
 
-export default function SettingsScreen({ categories, recurring, onAddRecurring, onToggleRecurring, onDeleteRecurring, onAddCategory, onDeleteCategory, onShowCategoryForm, onShowRecurringForm }) {
+export default function SettingsScreen({ categories, recurring, onAddRecurring, onToggleRecurring, onDeleteRecurring, onAddCategory, onDeleteCategory, onShowCategoryForm, onShowRecurringForm, settings, onShowPinFlow }) {
   const getCat = (id) => categories.find((c) => c.id === id) || categories[categories.length - 1];
 
   const freqDetail = (r) => {
@@ -349,6 +349,30 @@ export default function SettingsScreen({ categories, recurring, onAddRecurring, 
         })
       )}
 
+      <div style={s.divider} />
+
+      {/* ── 보안 ── */}
+      <div style={s.sectionTitle}>보안</div>
+      {settings?.pinHash ? (
+        <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+          <button style={secBtn} onClick={() => onShowPinFlow('change')}>🔑 비밀번호 변경</button>
+          <button style={secBtnDanger} onClick={() => onShowPinFlow('remove')}>🔓 비밀번호 해제</button>
+        </div>
+      ) : (
+        <button style={secBtn} onClick={() => onShowPinFlow('set')}>🔒 비밀번호 설정</button>
+      )}
+
     </div>
   );
 }
+
+const secBtn = {
+  width:'100%', padding:'14px 16px', borderRadius:14, textAlign:'left',
+  background:'rgba(139,92,246,0.1)', border:'1px solid rgba(139,92,246,0.3)',
+  color:'#A78BFA', fontSize:15, fontWeight:600, cursor:'pointer',
+};
+const secBtnDanger = {
+  width:'100%', padding:'14px 16px', borderRadius:14, textAlign:'left',
+  background:'rgba(239,68,68,0.08)', border:'1px solid rgba(239,68,68,0.25)',
+  color:'#EF4444', fontSize:15, fontWeight:600, cursor:'pointer',
+};

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { formatKRW, calcSummary, calcCumulativeBalance, calcCategorySpend, getDailySpend, getMonthTransactions, getDaysInMonth } from '../utils/helpers';
+import { formatKRW, calcSummary, calcCumulativeBalance, calcCategorySpend, getDailySpend, getMonthTransactions, getDaysInPeriod, getPeriodDayLabel, getTodayPeriodIdx, getCurrentPeriod } from '../utils/helpers';
 
 const s = {
   wrap: { padding: '16px 16px 80px' },
@@ -63,10 +63,10 @@ export default function AnalysisScreen({ transactions, year, month, categories }
   const balance = calcCumulativeBalance(transactions, year, month);
   const categorySpend = calcCategorySpend(monthTxs);
   const dailySpend = getDailySpend(monthTxs, year, month);
-  const days = getDaysInMonth(year, month);
-  const today = new Date();
-  const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
-  const todayIdx = isCurrentMonth ? today.getDate() - 1 : -1;
+  const days = getDaysInPeriod(year, month);
+  const { year: cpYear, month: cpMonth } = getCurrentPeriod();
+  const isCurrentMonth = year === cpYear && month === cpMonth;
+  const todayIdx = isCurrentMonth ? getTodayPeriodIdx(year, month) : -1;
 
   const topCats = useMemo(() => {
     return categories.filter((c) => c.type === 'expense')
@@ -157,11 +157,14 @@ export default function AnalysisScreen({ transactions, year, month, categories }
             ))}
           </div>
           <div style={s.dayLabels}>
-            {Array.from({ length: days }, (_, i) => (
-              <span key={i} style={s.dayLabel(i === todayIdx)}>
-                {(i + 1) % 5 === 1 || i === todayIdx ? i + 1 : ''}
-              </span>
-            ))}
+            {Array.from({ length: days }, (_, i) => {
+              const dayNum = getPeriodDayLabel(i, year, month);
+              return (
+                <span key={i} style={s.dayLabel(i === todayIdx)}>
+                  {i % 5 === 0 || i === todayIdx ? dayNum : ''}
+                </span>
+              );
+            })}
           </div>
         </div>
       </div>

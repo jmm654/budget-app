@@ -14,7 +14,7 @@ import {
   loadCustomCategories, saveCustomCategories,
 } from './utils/storage';
 import { CATEGORIES } from './utils/categories';
-import { applyRecurring, calcCategorySpend, getMonthTransactions, generateId } from './utils/helpers';
+import { applyRecurring, calcCategorySpend, getMonthTransactions, generateId, getCurrentPeriod, getPeriodForDate } from './utils/helpers';
 
 const NOTIFICATION_DURATION = 4000;
 
@@ -53,9 +53,8 @@ function Toast({ message, visible }) {
 }
 
 export default function App() {
-  const now = new Date();
-  const [year, setYear] = useState(now.getFullYear());
-  const [month, setMonth] = useState(now.getMonth());
+  const [year, setYear] = useState(() => getCurrentPeriod().year);
+  const [month, setMonth] = useState(() => getCurrentPeriod().month);
   const [activeTab, setActiveTab] = useState(0);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -93,8 +92,7 @@ export default function App() {
     if (savedTx.type !== 'expense') return;
     const budget = budgets[savedTx.category];
     if (!budget) return;
-    const txYear = parseInt(savedTx.date.split('-')[0]);
-    const txMonth = parseInt(savedTx.date.split('-')[1]) - 1;
+    const { year: txYear, month: txMonth } = getPeriodForDate(savedTx.date);
     const monthTxs = getMonthTransactions(updatedTxs, txYear, txMonth);
     const spend = calcCategorySpend(monthTxs);
     const spent = spend[savedTx.category] || 0;
@@ -201,12 +199,12 @@ export default function App() {
   };
 
   const handleToday = () => {
-    const n = new Date();
-    setYear(n.getFullYear());
-    setMonth(n.getMonth());
+    const { year: y, month: m } = getCurrentPeriod();
+    setYear(y);
+    setMonth(m);
   };
 
-  const isCurrentMonth = year === now.getFullYear() && month === now.getMonth();
+  const isCurrentMonth = (() => { const p = getCurrentPeriod(); return year === p.year && month === p.month; })();
 
   const screenProps = { transactions, year, month, categories: allCategories };
 

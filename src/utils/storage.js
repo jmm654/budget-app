@@ -3,6 +3,7 @@ const KEYS = {
   BUDGETS: 'budget_budgets',
   RECURRING: 'budget_recurring',
   CUSTOM_CATEGORIES: 'budget_custom_categories',
+  ASSETS: 'budget_assets',
 };
 
 const load = (key, fallback) => {
@@ -31,3 +32,6 @@ export const saveRecurring = (recurring) => save(KEYS.RECURRING, recurring);
 
 export const loadCustomCategories = () => load(KEYS.CUSTOM_CATEGORIES, []);
 export const saveCustomCategories = (cats) => save(KEYS.CUSTOM_CATEGORIES, cats);
+
+export const loadAssets = () => load(KEYS.ASSETS, []);
+export const saveAssets = (assets) => save(KEYS.ASSETS, assets);

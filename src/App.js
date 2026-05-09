@@ -7,11 +7,13 @@ import TransactionForm from './components/TransactionForm';
 import BudgetScreen from './components/BudgetScreen';
 import AnalysisScreen from './components/AnalysisScreen';
 import SettingsScreen, { CategoryForm, AddRecurringForm } from './components/SettingsScreen';
+import AssetScreen, { AssetForm } from './components/AssetScreen';
 import {
   loadTransactions, saveTransactions,
   loadBudgets, saveBudgets,
   loadRecurring, saveRecurring,
   loadCustomCategories, saveCustomCategories,
+  loadAssets, saveAssets,
 } from './utils/storage';
 import { CATEGORIES } from './utils/categories';
 import { applyRecurring, calcCategorySpend, getMonthTransactions, generateId, getCurrentPeriod, getPeriodForDate } from './utils/helpers';
@@ -62,9 +64,12 @@ export default function App() {
   const [budgets, setBudgets] = useState(() => loadBudgets());
   const [recurring, setRecurring] = useState(() => loadRecurring());
   const [customCategories, setCustomCategories] = useState(() => loadCustomCategories());
+  const [assets, setAssets] = useState(() => loadAssets());
   const [toast, setToast] = useState({ message: '', visible: false });
   const [showCategoryForm, setShowCategoryForm] = useState(false);
   const [showRecurringForm, setShowRecurringForm] = useState(false);
+  const [showAssetForm, setShowAssetForm] = useState(false);
+  const [editingAsset, setEditingAsset] = useState(null);
 
   const allCategories = useMemo(
     () => [...CATEGORIES, ...customCategories],
@@ -178,6 +183,33 @@ export default function App() {
     showToast('✓ 카테고리가 추가되었습니다');
   }, [showToast]);
 
+  const handleSaveAsset = useCallback((asset) => {
+    setAssets((prev) => {
+      const exists = prev.find((a) => a.id === asset.id);
+      const updated = exists ? prev.map((a) => (a.id === asset.id ? asset : a)) : [...prev, asset];
+      saveAssets(updated);
+      return updated;
+    });
+    setShowAssetForm(false);
+    setEditingAsset(null);
+    showToast(editingAsset ? '✓ 자산이 수정되었습니다' : '✓ 자산이 추가되었습니다');
+  }, [showToast, editingAsset]);
+
+  const handleDeleteAsset = useCallback((id) => {
+    if (!window.confirm('이 자산을 삭제할까요?')) return;
+    setAssets((prev) => {
+      const updated = prev.filter((a) => a.id !== id);
+      saveAssets(updated);
+      return updated;
+    });
+    showToast('✓ 자산이 삭제되었습니다');
+  }, [showToast]);
+
+  const handleEditAsset = useCallback((asset) => {
+    setEditingAsset(asset);
+    setShowAssetForm(true);
+  }, []);
+
   const handleDeleteCategory = useCallback((id) => {
     if (!window.confirm('이 카테고리를 삭제할까요?\n해당 카테고리의 기존 내역은 유지됩니다.')) return;
     setCustomCategories((prev) => {
@@ -259,6 +291,14 @@ export default function App() {
             onShowRecurringForm={() => setShowRecurringForm(true)}
           />
         )}
+        {activeTab === 5 && (
+          <AssetScreen
+            assets={assets}
+            onEdit={handleEditAsset}
+            onDelete={handleDeleteAsset}
+            onAddClick={() => { setEditingAsset(null); setShowAssetForm(true); }}
+          />
+        )}
       </main>
 
       <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
@@ -285,6 +325,14 @@ export default function App() {
           categories={allCategories}
           onSave={(r) => { handleAddRecurring(r); setShowRecurringForm(false); }}
           onClose={() => setShowRecurringForm(false)}
+        />
+      )}
+
+      {showAssetForm && (
+        <AssetForm
+          editingAsset={editingAsset}
+          onSave={handleSaveAsset}
+          onClose={() => { setShowAssetForm(false); setEditingAsset(null); }}
         />
       )}
 

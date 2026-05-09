@@ -6,6 +6,7 @@ const TABS = [
   { id: 2, label: '예산', icon: '🎯' },
   { id: 3, label: '분석', icon: '📊' },
   { id: 4, label: '설정', icon: '⚙️' },
+  { id: 5, label: '자산', icon: '🏛️' },
 ];
 
 const s = {

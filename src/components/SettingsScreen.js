@@ -172,6 +172,8 @@ const s = {
   btnRow: { display:'flex', gap:10 },
   cancelBtn: { flex:1, padding:'13px', borderRadius:12, background:'#1E1E1E', border:'1px solid #3D3D3D', color:'#9CA3AF', fontSize:14, fontWeight:600, cursor:'pointer' },
   saveBtn: { flex:2, padding:'13px', borderRadius:12, background:'linear-gradient(135deg,#7C3AED,#8B5CF6)', color:'white', fontSize:14, fontWeight:700, cursor:'pointer', border:'none' },
+  secBtn: { width:'100%', padding:'14px 16px', borderRadius:14, textAlign:'left', background:'rgba(139,92,246,0.1)', border:'1px solid rgba(139,92,246,0.3)', color:'#A78BFA', fontSize:15, fontWeight:600, cursor:'pointer', marginBottom:8 },
+  secBtnDanger: { width:'100%', padding:'14px 16px', borderRadius:14, textAlign:'left', background:'rgba(239,68,68,0.08)', border:'1px solid rgba(239,68,68,0.25)', color:'#EF4444', fontSize:15, fontWeight:600, cursor:'pointer' },
 };
 
 function AddRecurringForm({ categories, onSave, onClose }) {
@@ -354,25 +356,14 @@ export default function SettingsScreen({ categories, recurring, onAddRecurring, 
       {/* ── 보안 ── */}
       <div style={s.sectionTitle}>보안</div>
       {settings?.pinHash ? (
-        <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
-          <button style={secBtn} onClick={() => onShowPinFlow('change')}>🔑 비밀번호 변경</button>
-          <button style={secBtnDanger} onClick={() => onShowPinFlow('remove')}>🔓 비밀번호 해제</button>
-        </div>
+        <>
+          <button style={s.secBtn} onClick={() => onShowPinFlow('change')}>🔑 비밀번호 변경</button>
+          <button style={s.secBtnDanger} onClick={() => onShowPinFlow('remove')}>🔓 비밀번호 해제</button>
+        </>
       ) : (
-        <button style={secBtn} onClick={() => onShowPinFlow('set')}>🔒 비밀번호 설정</button>
+        <button style={s.secBtn} onClick={() => onShowPinFlow('set')}>🔒 비밀번호 설정</button>
       )}
 
     </div>
   );
 }
-
-const secBtn = {
-  width:'100%', padding:'14px 16px', borderRadius:14, textAlign:'left',
-  background:'rgba(139,92,246,0.1)', border:'1px solid rgba(139,92,246,0.3)',
-  color:'#A78BFA', fontSize:15, fontWeight:600, cursor:'pointer',
-};
-const secBtnDanger = {
-  width:'100%', padding:'14px 16px', borderRadius:14, textAlign:'left',
-  background:'rgba(239,68,68,0.08)', border:'1px solid rgba(239,68,68,0.25)',
-  color:'#EF4444', fontSize:15, fontWeight:600, cursor:'pointer',
-};

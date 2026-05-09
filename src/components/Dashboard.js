@@ -99,13 +99,14 @@ const s = {
   emptyText: { textAlign: 'center', color: '#6B7280', fontSize: 14, padding: '20px 0' },
 };
 
-export default function Dashboard({ transactions, budgets, year, month, categories, onEdit, onAddClick }) {
+export default function Dashboard({ transactions, budgets, year, month, categories, assets, onEdit, onAddClick }) {
   const getCat = (id) => categories.find((c) => c.id === id) || categories[categories.length - 1];
   const monthTxs = getMonthTransactions(transactions, year, month);
   const { income, expense } = calcSummary(monthTxs);
   const balance = calcCumulativeBalance(transactions, year, month);
   const categorySpend = calcCategorySpend(monthTxs);
   const recent = [...monthTxs].sort((a, b) => b.date.localeCompare(a.date) || b.createdAt - a.createdAt).slice(0, 5);
+  const totalAssets = (assets || []).reduce((sum, a) => sum + a.amount, 0);
 
   const budgetAlerts = categories.filter((c) => c.type === 'expense')
     .filter((cat) => budgets[cat.id] && categorySpend[cat.id])
@@ -127,7 +128,7 @@ export default function Dashboard({ transactions, budgets, year, month, categori
         <span style={{ fontSize: 36 }}>💰</span>
       </div>
 
-      {/* Income / Expense Summary */}
+      {/* Income / Expense / Asset Summary */}
       <div style={s.summaryRow}>
         <div style={s.summaryCard('#10B981', 'rgba(16,185,129,0.08)')}>
           <div style={s.summaryLabel}>수입</div>
@@ -136,6 +137,10 @@ export default function Dashboard({ transactions, budgets, year, month, categori
         <div style={s.summaryCard('#F87171', 'rgba(248,113,113,0.08)')}>
           <div style={s.summaryLabel}>지출</div>
           <div style={s.summaryAmount('#F87171')}>{formatKRW(expense)}</div>
+        </div>
+        <div style={s.summaryCard('#A78BFA', 'rgba(167,139,250,0.08)')}>
+          <div style={s.summaryLabel}>자산</div>
+          <div style={s.summaryAmount('#A78BFA')}>{formatKRW(totalAssets)}</div>
         </div>
       </div>
 

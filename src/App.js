@@ -256,6 +256,7 @@ export default function App() {
           <Dashboard
             {...screenProps}
             budgets={budgets}
+            assets={assets}
             onEdit={handleEditTransaction}
             onAddClick={() => { setEditingId(null); setShowForm(true); }}
           />
